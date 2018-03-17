@@ -21,7 +21,7 @@ type Color struct {
 
 // NewHex returns a new color from a 6 digits hexadecimal value.
 func NewHex(h string) (*Color, error) {
-	h = strings.TrimSuffix(h, "#")
+	h = strings.TrimPrefix(h, "#")
 	if len(h) != 6 {
 		return nil, ErrNotColor
 	}
@@ -116,7 +116,7 @@ func ShortenHex(h string) string {
 	var sh string
 	if h[0] == '#' {
 		sh = "#"
-		h = strings.TrimSuffix(h, "#")
+		h = strings.TrimPrefix(h, "#")
 	}
 	if len(h) == 6 && h[0] == h[1] && h[2] == h[3] && h[4] == h[5] {
 		return sh + string(h[0]) + string(h[2]) + string(h[4])
