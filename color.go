@@ -21,6 +21,7 @@ type Color struct {
 
 // NewHex returns a new color from a 6 digits hexadecimal value.
 func NewHex(h string) (*Color, error) {
+	// TODO: Accept short hex.
 	h = strings.TrimPrefix(h, "#")
 	if len(h) != 6 {
 		return nil, ErrNotColor
@@ -112,11 +113,18 @@ func (c *Color) HexAlpha() string {
 
 // ShortenHex shortens a 6 or 8 digits hexadecimal color value if possible.
 // Otherwise, the received value is returned unchanged.
-func ShortenHex(h string) string {
-	var sh string
+func ShortenHex(h string) (sh string) {
+	if !IsColorHex(h) {
+		return h
+	}
+
 	if h[0] == '#' {
 		sh = "#"
 		h = strings.TrimPrefix(h, "#")
+	}
+	h = strings.ToLower(h)
+	if len(h) == 8 && h[6:] == "ff" {
+		h = h[:6]
 	}
 	if len(h) == 6 && h[0] == h[1] && h[2] == h[3] && h[4] == h[5] {
 		return sh + string(h[0]) + string(h[2]) + string(h[4])
@@ -125,4 +133,20 @@ func ShortenHex(h string) string {
 		return sh + string(h[0]) + string(h[2]) + string(h[4]) + string(h[6])
 	}
 	return sh + h
+}
+
+// IsColorHex tells if h represents an hexadecimal color value.
+func IsColorHex(h string) bool {
+	h = strings.TrimPrefix(h, "#")
+	if len(h) != 3 && len(h) != 4 && len(h) != 6 && len(h) != 8 {
+		return false
+	}
+	for i := 0; i < len(h); i++ {
+		if !((h[i] >= '0' && h[i] <= '9') ||
+			(h[i] >= 'A' && h[i] <= 'F') ||
+			(h[i] >= 'a' && h[i] <= 'f')) {
+			return false
+		}
+	}
+	return true
 }
