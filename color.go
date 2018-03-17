@@ -37,7 +37,7 @@ func NewHex(h string) (*Color, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Color{r: byte(r), g: byte(g), b: byte(b)}, nil
+	return &Color{byte(r), byte(g), byte(b), 1}, nil
 }
 
 // TODO: func NewHexAlpha() {}
@@ -46,7 +46,7 @@ func NewHex(h string) (*Color, error) {
 
 // NewRGB returns a new color from red, green and blue values.
 func NewRGB(r, g, b byte) *Color {
-	return &Color{r: r, g: g, b: b}
+	return &Color{r, g, b, 1}
 }
 
 // NewRGBA returns a new color from red, green and blue values.
@@ -102,10 +102,27 @@ func (c *Color) Hex() string {
 
 // AlphaHex returns the 8 digits hexadecimal color representation with alpha at the start.
 func (c *Color) AlphaHex() string {
-	return "#" + c.alphaToHex() + c.hex()
+	return "#" + ShortenHex(c.alphaToHex()+c.hex())
 }
 
 // HexAlpha returns the 8 digits hexadecimal color representation with alpha at the end.
 func (c *Color) HexAlpha() string {
-	return "#" + c.hex() + c.alphaToHex()
+	return "#" + ShortenHex(c.hex()+c.alphaToHex())
+}
+
+// ShortenHex shortens a 6 or 8 digits hexadecimal color value if possible.
+// Otherwise, the received value is returned unchanged.
+func ShortenHex(h string) string {
+	var sh string
+	if h[0] == '#' {
+		sh = "#"
+		h = strings.TrimSuffix(h, "#")
+	}
+	if len(h) == 6 && h[0] == h[1] && h[2] == h[3] && h[4] == h[5] {
+		return sh + string(h[0]) + string(h[2]) + string(h[4])
+	}
+	if len(h) == 8 && h[0] == h[1] && h[2] == h[3] && h[4] == h[5] && h[6] == h[7] {
+		return sh + string(h[0]) + string(h[2]) + string(h[4]) + string(h[6])
+	}
+	return sh + h
 }
